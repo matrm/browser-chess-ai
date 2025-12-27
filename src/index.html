@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<script src="coi-serviceworker.js"></script>
+	<link rel="icon" type="image/svg+xml" href="/vite.svg">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Browser Chess AI</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+	<div id="app">
+		<div id="board" class="chess-board"></div>
+		<div class="controls">
+			<div id="status">Your Turn</div>
+			<div class="separator"></div>
+
+			<div class="setting">
+				<label>Move History</label>
+				<div id="history" class="history-container"></div>
+			</div>
+			<div class="separator"></div>
+
+			<div class="setting">
+				<label>AI Mode</label>
+				<div style="display: flex; gap: 1rem; margin-bottom: 0.5rem;">
+					<label style="font-weight: normal;"><input type="radio" name="ai-mode" value="depth" checked> Fixed
+						Depth</label>
+					<label style="font-weight: normal;"><input type="radio" name="ai-mode" value="time"> Time
+						Limit</label>
+				</div>
+
+				<div id="depth-control">
+					<label for="difficulty">Depth: <span id="depth-val">20</span></label>
+					<input type="range" id="difficulty" min="1" max="35" value="20">
+				</div>
+
+				<div id="time-control" style="display: none;">
+					<label for="time-limit">Time (ms): <span id="time-val">1000</span></label>
+					<input type="range" id="time-limit" min="100" max="60000" step="100" value="1000">
+				</div>
+			</div>
+
+			<div class="separator"></div>
+			<div class="setting">
+				<label>Play as</label>
+				<div style="display: flex; gap: 1rem;">
+					<button id="play-white" style="flex: 1; background: #eee; color: #333;">White</button>
+					<button id="play-black" style="flex: 1; background: #333; color: #eee;">Black</button>
+				</div>
+			</div>
+
+			<div style="display: flex; gap: 1rem;">
+				<button id="undo-btn" style="flex: 1;">Undo</button>
+				<button id="rotate-btn" style="flex: 1;">Rotate</button>
+			</div>
+		</div>
+	</div>
+	<div id="modal-container" class="modal-container">
+		<div class="modal">
+			<h2 id="modal-title">New Game</h2>
+			<p id="modal-message">Start a new game?</p>
+			<div class="modal-buttons">
+				<button id="modal-cancel" class="btn-secondary">Cancel</button>
+				<button id="modal-confirm">Confirm</button>
+			</div>
+		</div>
+	</div>
+
+	<script type="module" src="./main.ts"></script>
+</body>
+
+</html>
