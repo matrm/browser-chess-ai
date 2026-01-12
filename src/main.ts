@@ -25,6 +25,7 @@ const elements = {
 	modalMessage: document.getElementById('modal-message') as HTMLParagraphElement,
 	modalConfirm: document.getElementById('modal-confirm') as HTMLButtonElement,
 	modalCancel: document.getElementById('modal-cancel') as HTMLButtonElement,
+	engineLoader: document.getElementById('engine-loader') as HTMLDivElement,
 };
 
 /**
@@ -34,7 +35,7 @@ const elements = {
 const game = new Chess();
 const engine = new ChessEngine();
 
-let gameState = {
+const gameState = {
 	playerColor: 'w' as 'w' | 'b',
 	aiMode: 'depth' as 'depth' | 'time',
 	aiDepth: parseInt(elements.difficultyInput.value, 10),
@@ -44,6 +45,7 @@ let gameState = {
 	isAiThinking: false,
 	aiStartTime: 0,
 	isBoardRotated: false,
+	isEngineReady: false,
 };
 
 /**
@@ -60,9 +62,16 @@ const PIECES: Record<string, string> = {
  * Sets up the engine and initial render.
  */
 async function init() {
+	// Render the board immediately so the user doesn't see a blank page
+	updateUI();
+
 	try {
 		await engine.init();
 		console.log('Stockfish initialized');
+
+		// Hide the loading indicator
+		elements.engineLoader.classList.add('hidden');
+		gameState.isEngineReady = true;
 
 		// Configure engine options
 		// const threads = Math.max(1, (navigator.hardwareConcurrency || 2) - 1);// Causes access violation crashes when using many threads.
@@ -97,6 +106,7 @@ async function init() {
 		updateUI();
 	} catch (e) {
 		console.error('Engine failed:', e);
+		elements.engineLoader.classList.add('hidden');
 		elements.status.textContent = 'Error loading engine';
 	}
 }
@@ -218,6 +228,11 @@ function createSquareElement(square: Square, isLight: boolean, piece: any, lastM
  * Displays current game status (turn, checkmate, etc.).
  */
 function updateStatus() {
+	if (!gameState.isEngineReady) {
+		elements.status.textContent = 'Loading Engine...';
+		return;
+	}
+
 	if (game.isGameOver()) {
 		if (game.isCheckmate()) {
 			elements.status.textContent = `Checkmate! ${game.turn() === 'w' ? 'Black' : 'White'} wins.`;
@@ -277,8 +292,8 @@ function renderHistory() {
  * Logic for selecting pieces and initiating moves.
  */
 function handleSquareClick(square: Square) {
-	// Prevent interaction if AI is thinking or game is over
-	if (gameState.isAiThinking || game.isGameOver()) return;
+	// Prevent interaction if engine is not ready, AI is thinking, or game is over.
+	if (!gameState.isEngineReady || gameState.isAiThinking || game.isGameOver()) return;
 	// Prevent interaction if it's not player's turn
 	if (game.turn() !== gameState.playerColor) return;
 
@@ -417,6 +432,7 @@ elements.timeInput.addEventListener('input', (e) => {
 
 // Play as White
 elements.playWhiteBtn.addEventListener('click', async () => {
+	if (!gameState.isEngineReady) return;
 	if (game.history().length > 0) {
 		const confirmed = await showModal('New Game', 'Start a new game as White? Current progress will be lost.');
 		if (!confirmed) return;
@@ -429,6 +445,7 @@ elements.playWhiteBtn.addEventListener('click', async () => {
 
 // Play as Black
 elements.playBlackBtn.addEventListener('click', async () => {
+	if (!gameState.isEngineReady) return;
 	if (game.history().length > 0) {
 		const confirmed = await showModal('New Game', 'Start a new game as Black? Current progress will be lost.');
 		if (!confirmed) return;
@@ -449,7 +466,7 @@ function updatePlayerButtonStyles() {
 
 // Undo Button
 elements.undoBtn.addEventListener('click', () => {
-	if (gameState.isAiThinking) return;
+	if (!gameState.isEngineReady || gameState.isAiThinking) return;
 
 	// Undo last move
 	game.undo();

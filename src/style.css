@@ -31,6 +31,13 @@ body {
 	width: 100%;
 }
 
+.board-container {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+	align-items: center;
+}
+
 .chess-board {
 	display: grid;
 	grid-template-columns: repeat(8, clamp(40px, 10vmin, 80px));
@@ -88,6 +95,47 @@ body {
 	pointer-events: none;
 }
 
+
+/* Engine Loader */
+.engine-loader {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	background: rgba(0, 0, 0, 0.3);
+	padding: 0.75rem 1.5rem;
+	border-radius: 2rem;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	animation: fadeIn 0.5s ease-out;
+}
+
+.engine-loader span {
+	font-size: 0.9rem;
+	font-weight: 500;
+	color: #aaa;
+}
+
+.spinner {
+	width: 20px;
+	height: 20px;
+	border: 2px solid rgba(255, 255, 255, 0.1);
+	border-top: 2px solid #6aa345;
+	border-radius: 50%;
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	0% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+.engine-loader.hidden {
+	display: none;
+}
 
 @keyframes pulse {
 	0% {
